@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    networks:
+      - rabbitmq_network
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  postgres:
+    image: postgres
+    networks:
+      - bridge_network
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "postgres"
+    ports:
+      - "5432:5432"
+  producer:
+    build:
+      context: ./producer
+    networks:
+      - microservices_network
+      - bridge_network
+    depends_on:
+      - rabbitmq
+    ports:
+      - "5000:5000"
+  
+  consumer_one:
+    build: 
+      context: ./consumer_one
+    networks:
+      - microservices_network
+      - bridge_network
+    depends_on:
+      - rabbitmq
+    environment:
+      - RabbitMQ_host = "rabbitmq"
+  
+  consumer_two:
+    build: 
+      context: ./consumer_two
+    networks:
+      - microservices_network
+      - bridge_network
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      - RabbitMQ_host= "rabbitmq"
+      - Postgres_host= "postgres"
+  consumer_three:
+    build: 
+      context: ./consumer_three
+    networks:
+      - microservices_network
+      - bridge_network
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      - RabbitMQ_host= "rabbitmq"
+      - Postgres_host= "postgres"
+  
+  consumer_four:
+    build: 
+      context: ./consumer_four
+    networks:
+      - microservices_network
+      - bridge_network
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      - RabbitMQ_host= "rabbitmq"
+      - Postgres_host= "postgres"
+networks:
+  rabbitmq_network:
+    driver: bridge
+  bridge_network:
+    driver: bridge
+  microservices_network:
+    driver: bridge

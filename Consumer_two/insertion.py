@@ -2,7 +2,14 @@ import pika
 import psycopg2
 import os
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
+# credentials=pika.PlainCredentials(os.environ['RabbitMQ_username'],os.environ['RabbitMQ_password'])
+credentials=pika.PlainCredentials("myuser","mypassword")
+
+# connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq",heartbeat=1000,port=5672,virtual_host="/", credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters("172.23.0.1",credentials=credentials, port=5672))
+
+
+
 channel = connection.channel()
 if(connection.is_open):
     print('RabbitMQ connection Successful')

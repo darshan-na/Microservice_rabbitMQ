@@ -1,86 +1,90 @@
 version: '3'
 
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    networks:
-      - rabbitmq_network
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
   postgres:
     image: postgres
     networks:
-      - bridge_network
+      - app_network
     environment:
       POSTGRES_PASSWORD: "password"
       POSTGRES_USER: "postgres"
     ports:
       - "5432:5432"
+    volumes:
+      - db:/data/postgres   
+
   producer:
     build:
       context: ./producer
     networks:
-      - microservices_network
-      - bridge_network
-    depends_on:
-      - rabbitmq
-    ports:
-      - "5000:5000"
-  
-  consumer_one:
-    build: 
-      context: ./consumer_one
-    networks:
-      - microservices_network
-      - bridge_network
-    depends_on:
-      - rabbitmq
+      - app_network
+    
     environment:
       - RabbitMQ_host = "rabbitmq"
-  
-  consumer_two:
-    build: 
-      context: ./consumer_two
-    networks:
-      - microservices_network
-      - bridge_network
-    depends_on:
-      - rabbitmq
-      - postgres
-    environment:
-      - RabbitMQ_host= "rabbitmq"
-      - Postgres_host= "postgres"
-  consumer_three:
-    build: 
-      context: ./consumer_three
-    networks:
-      - microservices_network
-      - bridge_network
-    depends_on:
-      - rabbitmq
-      - postgres
-    environment:
-      - RabbitMQ_host= "rabbitmq"
-      - Postgres_host= "postgres"
-  
-  consumer_four:
-    build: 
-      context: ./consumer_four
-    networks:
-      - microservices_network
-      - bridge_network
-    depends_on:
-      - rabbitmq
-      - postgres
-    environment:
-      - RabbitMQ_host= "rabbitmq"
-      - Postgres_host= "postgres"
+      - RabbitMQ_username = "user"
+      - RabbitMQ_password = "password"
+
+    ports:
+      - "5000:5000"
+    # restart: on-failure
 networks:
-  rabbitmq_network:
-    driver: bridge
-  bridge_network:
-    driver: bridge
-  microservices_network:
-    driver: bridge
+  app_network:
+    external:
+      name: rabbitmq_network
+volumes:
+  db:
+  # consumer_one:
+  #   build: 
+  #     context: ./consumer_one
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - RabbitMQ_host = "rabbitmq"
+  #     - RabbitMQ_username = "user"
+  #     - RabbitMQ_password = "password"
+  #   # restart: on-failure
+
+  # consumer_two:
+  #   build: 
+  #     context: ./consumer_two
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - RabbitMQ_host= "rabbitmq"
+  #     - Postgres_host= "postgres"
+  #     - RabbitMQ_username = "user"
+  #     - RabbitMQ_password = "password"
+  #   # restart: on-failure
+
+  # consumer_three:
+  #   build: 
+  #     context: ./consumer_three
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - RabbitMQ_host= "rabbitmq"
+  #     - Postgres_host= "postgres"
+  #     - RabbitMQ_username = "user"
+  #     - RabbitMQ_password = "password"
+  #   # restart: on-failure
+
+  # consumer_four:
+  #   build: 
+  #     context: ./consumer_four
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - RabbitMQ_host= "rabbitmq"
+  #     - Postgres_host= "postgres"
+  #     - RabbitMQ_username = "user"
+  #     - RabbitMQ_password = "password"
+  #   # restart: on-failure
+

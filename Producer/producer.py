@@ -3,8 +3,11 @@ import pika
 import os
 app = Flask(__name__)
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
-channel = connection.channel();
+# credentials=pika.PlainCredentials(os.environ['RabbitMQ_username'],os.environ['RabbitMQ_password'])
+# credentials=pika.PlainCredentials("myuser","mypassword")
+connection = pika.BlockingConnection(pika.ConnectionParameters("172.27.0.1"))
+
+channel = connection.channel()
 
 channel.queue_declare(queue='health_check')
 channel.queue_declare(queue='insert_record')

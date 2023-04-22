@@ -4,7 +4,12 @@ import pandas as pd
 import os
 value = os.environ.get('RabbitMQ_host')
 value1 = os.environ.get('Postgres_host')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RabbitMQ_host'],heartbeat=1000))
+# credentials=pika.PlainCredentials(os.environ['RabbitMQ_username'],os.environ['RabbitMQ_password'])
+credentials=pika.PlainCredentials("myuser","mypassword")
+
+# connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq",heartbeat=1000,port=5672,virtual_host="/", credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters("172.23.0.1",credentials=credentials, port=5672))
+
 if(connection.is_open):
     print("RabbitMQ connection established")
 else:
